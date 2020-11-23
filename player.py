@@ -171,13 +171,13 @@ class Player(object):
 
     def shoot(self, app):
         p0 = self.pos
-        p1 = getBoundaryIntersection(app)
+        p1 = self.getBoundaryIntersection(app)
         i = 0
         while i < len(app.asteroids):
             asteroid = app.asteroids[i]
             ax, ay = asteroid.pos
             if(sliceFunction.sliceIntersectsPolygon(asteroid.globalPoints, p0, p1)):
-                #sliceFruit(app, f, i, p0, p1, app.width, app.height)
+                self.sliceAsteroid(app, asteroid, i, p0, p1, app.width, app.height)
                 i += 1
             i += 1
 
@@ -185,10 +185,17 @@ class Player(object):
         vectorX, vectorY = getVector(self.angle)
         shootRay = Ray(self.pos, vectorX, vectorY, self.angle)
         for boundary in app.boundaryList:
-            intersectPoint = ray.cast(boundary)
+            intersectPoint = shootRay.cast(boundary)
             if intersectPoint != None:
+                print(intersectPoint)
                 return intersectPoint
         return self.pos # no intersections
+
+    def sliceAsteroid(self, app, asteroid, i, p0, p1, width, height):
+        (asteroid1, asteroid2) = asteroid.slice(p0, p1, width, height)
+        app.asteroids.pop(i)
+        app.asteroids.insert(i,asteroid1)
+        app.asteroids.insert(i,asteroid2)
 
     def show(self, app, canvas):
         if len(self.intersectList) > 0:

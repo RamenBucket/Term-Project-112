@@ -66,6 +66,9 @@ def keyPressed(app, event):
     controls = {'w', 'a', 's', 'd', 'q', 'e'}
     if event.key in controls:
         app.inputs.add(event.key)
+    if event.key == 'r':
+        print('shoot')
+        app.player.shoot(app)
     
 def keyReleased(app, event):
     controls = {'w', 'a', 's', 'd', 'q', 'e'}
