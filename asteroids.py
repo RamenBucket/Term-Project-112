@@ -8,7 +8,7 @@ import orderClockwise
 import centroid
 import math
 import time
-import copy
+import random
 
 asteroidOutlines = [
     [(-50,0),(-35,35),(0,50),(35,35),(50,0),(35,-35),(0,-50),(-35,-35)],
@@ -45,6 +45,8 @@ def appStarted(app):
     bg = app.loadImage('space_bg.png')
     app.bg = ImageTk.PhotoImage(bg)
     # timer
+    app.lastWaveTime = time.time()
+    app.timeBetweenWaves = 5
     app.timerDelay = 1
     app.mouseMovedDelay = 2
 
@@ -58,6 +60,32 @@ def initAsteroids(app):
     app.asteroids.append(newAsteroid1)
     app.asteroids.append(newAsteroid2)
     app.asteroids.append(newAsteroid3)
+
+def spawnAsteroids(app):
+    if (time.time() - app.lastWaveTime > app.timeBetweenWaves):
+        spawnAmount = random.randint(2, 5)
+
+def createWave(app, amount):
+    margin = 50
+    newWave = []
+    for i in range(amount):
+        randomX = random.randint(0 - margin, app.width + margin)
+        # to prevent asteroid from spawing in the playfield
+        if 0 <= randomX <= app.width:
+            randomY = random.choice([random.randint(0 - margin, 0), random.randint(app.height, app.height + margin)])
+        else:
+            randomY = random.randint(0 - margin, app.width + margin)
+
+def removeAsteroids(app):
+    margin = 50
+    i = 0
+    while i < len(app.asteroids):
+        asteroid = app.asteroids[i]
+        x, y = asteroid.pos
+        if not (0 - margin <= x <= app.width + margin) or not (0 - margin <= y <= app.height):
+            app.asteroids.pop(i)
+        else:
+            i += 1
 
 def keyPressed(app, event):
     controls = {'w', 'a', 's', 'd', 'q', 'e'}
@@ -78,6 +106,8 @@ def timerFired(app):
         asteroid.move()
 
     app.player.update(app)
+
+    removeAsteroids(app)
 
 def redrawAll(app, canvas):
     drawBackground(app, canvas)

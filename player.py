@@ -155,9 +155,9 @@ class Player(object):
         # changes position of local points
         self.points = globalToLocal(self.globalPoints, cx, cy) 
 
-    def move(self):
-        self.pos[0] += self.movementVector[0] # movement in the x direction
-        self.pos[1] += self.movementVector[1] # movement in the y direction
+    def move(self, app):
+        self.pos[0] = (self.pos[0] + self.movementVector[0]) % app.width # movement in the x direction
+        self.pos[1] = (self.pos[1] + self.movementVector[1]) % app.height # movement in the y direction
         self.globalPoints = localToGlobal(self.points, self.pos[0], self.pos[1])
 
     def updateIntersectList(self, app):
@@ -166,7 +166,7 @@ class Player(object):
 
     def update(self, app):
         self.updateMovement(app.inputs)
-        self.move()
+        self.move(app)
         self.updateIntersectList(app)
 
     def shoot(self, app):
