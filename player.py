@@ -183,11 +183,13 @@ class Player(object):
 
     def getBoundaryIntersection(self, app):
         vectorX, vectorY = getVector(self.angle)
-        shootRay = Ray(self.pos, vectorX, vectorY, self.angle)
+        # negative vector for x
+        shootRay = Ray(self.pos, -vectorX, vectorY, self.angle)
         for boundary in app.boundaryList:
             intersectPoint = shootRay.cast(boundary)
             if intersectPoint != None:
                 print(intersectPoint)
+                print(self.angle)
                 return intersectPoint
         return self.pos # no intersections
 

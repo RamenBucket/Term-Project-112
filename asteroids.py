@@ -58,9 +58,6 @@ def initAsteroids(app):
     app.asteroids.append(newAsteroid1)
     app.asteroids.append(newAsteroid2)
     app.asteroids.append(newAsteroid3)
-            
-""" def mouseMoved(app, event):
-    app.particlePos = event.x, event.y """
 
 def keyPressed(app, event):
     controls = {'w', 'a', 's', 'd', 'q', 'e'}
@@ -76,10 +73,11 @@ def keyReleased(app, event):
         app.inputs.remove(event.key)
 
 def timerFired(app):
-    app.player.update(app)
-
+    # asteroid run first for update raycasting when slicing
     for asteroid in app.asteroids:
         asteroid.move()
+
+    app.player.update(app)
 
 def redrawAll(app, canvas):
     drawBackground(app, canvas)
