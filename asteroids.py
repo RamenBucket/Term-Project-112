@@ -30,7 +30,7 @@ playerShape = [[0,-20],[10,10],[0,5],[-10,10]]
 def appStarted(app):
     # asteroids
     app.asteroids = []
-    initAsteroids(app)
+    #initAsteroids(app)
     # boundary
     app.boundaryList = [PolygonSide((0,0),(app.width,0)),
                         PolygonSide((app.width,0),(app.width,app.height)),
@@ -63,18 +63,33 @@ def initAsteroids(app):
 
 def spawnAsteroids(app):
     if (time.time() - app.lastWaveTime > app.timeBetweenWaves):
-        spawnAmount = random.randint(2, 5)
+        spawnAmount = random.randint(2, 4)
+        createWave(app, spawnAmount)
+        app.lastWaveTime = time.time()
 
 def createWave(app, amount):
     margin = 50
     newWave = []
     for i in range(amount):
+        # random position
         randomX = random.randint(0 - margin, app.width + margin)
-        # to prevent asteroid from spawing in the playfield
-        if 0 <= randomX <= app.width:
-            randomY = random.choice([random.randint(0 - margin, 0), random.randint(app.height, app.height + margin)])
-        else:
-            randomY = random.randint(0 - margin, app.width + margin)
+        randomY = random.randint(0 - margin, app.height + margin)
+        while 0 < randomX < app.width and 0 < randomX < app.height:
+            randomX = random.randint(0 - margin, app.width + margin)
+            randomY = random.randint(0 - margin, app.height + margin)
+        # random velocity
+        if randomX < app.width: 
+            xVector = random.uniform(0,2)
+        else: 
+            xVector = -1 * random.uniform(0,2)
+        if randomY < app.height: 
+            yVector = random.uniform(0,2)
+        else: 
+            yVector = -1 * random.uniform(0,2)
+        # create random asteroid
+        newWave.append(Asteroid(asteroidOutlines[1], (randomX, randomY), (xVector, yVector), asteroidTypes[1], False))
+    
+    app.asteroids.extend(newWave)
 
 def removeAsteroids(app):
     margin = 50
@@ -91,8 +106,7 @@ def keyPressed(app, event):
     controls = {'w', 'a', 's', 'd', 'q', 'e'}
     if event.key in controls:
         app.inputs.add(event.key)
-    if event.key == 'r':
-        print('shoot')
+    if event.key == 'Space':
         app.player.shoot(app)
     
 def keyReleased(app, event):
@@ -101,6 +115,7 @@ def keyReleased(app, event):
         app.inputs.remove(event.key)
 
 def timerFired(app):
+    spawnAsteroids(app)
     # asteroid run first for update raycasting when slicing
     for asteroid in app.asteroids:
         asteroid.move()

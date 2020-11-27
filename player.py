@@ -188,10 +188,8 @@ class Player(object):
         for boundary in app.boundaryList:
             intersectPoint = shootRay.cast(boundary)
             if intersectPoint != None:
-                print(intersectPoint)
-                print(self.angle)
                 return intersectPoint
-        return self.pos # no intersections
+        return self.pos # no intersections, should be impossible
 
     def sliceAsteroid(self, app, asteroid, i, p0, p1, width, height):
         (asteroid1, asteroid2) = asteroid.slice(p0, p1, width, height)
