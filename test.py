@@ -1,17 +1,21 @@
 from cmu_112_graphics import *
-
-class TestClass(object):
-    def __init__(self, text):
-        self.text = text
-
-    def displayText(self, app, canvas):
-        canvas.create_text(app.width/2, app.height/2, text = self.text)
-
+from boid import Boid
 
 def appStarted(app):
-    app.test = TestClass("hello")
+    app.flock = []
+    initFlock(app)
+
+def initFlock(app):
+    amount = 10
+    for i in range(amount):
+        pos = [app.width/2, app.height/2]
+        vel = [0, 0]
+        acc = [0, 0]
+        app.flock.append(Boid(pos, vel, acc))
 
 def redrawAll(app, canvas):
-    app.test.displayText(app, canvas)
+    for boid in app.flock:
+        boid.show(app, canvas)
+    
 
-runApp(width=256, height=256)
+runApp(width=512, height=512)
