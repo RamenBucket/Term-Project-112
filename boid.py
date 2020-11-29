@@ -92,6 +92,27 @@ class Boid(object):
                 steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSeparationForce)
         return steering
 
+    def asteroidSeparation(self, asteroids):
+        maxSeparationForceAsteroids = .03
+        perceptionRadius = 100
+        steering = [0, 0]
+        total = 0
+        separationWeight = 5
+        for asteroid in asteroids:
+            if distance(self.pos, asteroid.pos) < perceptionRadius:
+                diff = multiplyVector(subtractVector(self.pos, asteroid.pos), separationWeight)
+                diff = multiplyVector(divideVector(diff, distance(self.pos, asteroid.pos)), separationWeight)
+                steering = addVector(steering, diff)
+                total += 1 * separationWeight
+        if total > 0:
+            steering = divideVector(steering, total) # divide by total
+            steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSpeed)
+            steering = subtractVector(steering, self.vel) # subtracting
+            # limits the magnitude of alignment
+            if distance([0,0], steering) > maxSeparationForceAsteroids:
+                steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), maxSeparationForceAsteroids)
+        return steering
+
     def cohesion(self, boids):
         perceptionRadius = 50
         steering = [0, 0]
@@ -110,13 +131,15 @@ class Boid(object):
                 steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxCohesionForce)
         return steering
 
-    def flock(self, boids):
+    def flock(self, boids, asteroids):
         alignment = self.allign(boids)
         cohesion = self.cohesion(boids)
         separation = self.separation(boids)
+        asteroidSeparation = self.asteroidSeparation(asteroids)
         self.acc = addVector(self.acc, alignment)
         self.acc = addVector(self.acc, cohesion)
         self.acc = addVector(self.acc, separation)
+        self.acc = addVector(self.acc, asteroidSeparation)
 
     def update(self, app):
         # update position

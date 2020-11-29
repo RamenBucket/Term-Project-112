@@ -1,10 +1,13 @@
 from cmu_112_graphics import *
 from boid import *
+from asteroid import *
 import random
 import math
 import copy
 
 def appStarted(app):
+    app.asteroids = []
+    app.asteroids.append(Asteroid([(-50,0),(-35,35),(0,50),(35,35),(50,0),(35,-35),(0,-50),(-35,-35)], (app.width/2, app.height/2), (0,0), "medium", False))
     app.flock = []
     initFlock(app)
     # timer
@@ -26,12 +29,17 @@ def getVector(angle):
 
 def timerFired(app):
     for boid in app.flock:
-        boid.flock(app.flock)
+        boid.flock(app.flock, app.asteroids)
         boid.update(app)
 
 def redrawAll(app, canvas):
     canvas.create_rectangle(0, 0, app.width, app.height, fill = 'black')
     for boid in app.flock:
         boid.show(app, canvas)
+
+    for asteroid in app.asteroids:
+        asteroidX, asteroidY = asteroid.pos
+        coords = localToGlobal(asteroid.points, asteroidX, asteroidY)
+        canvas.create_polygon(coords, outline = 'white', fill = "black", width = 1)
 
 runApp(width=512, height=512)
