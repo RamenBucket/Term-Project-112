@@ -19,6 +19,22 @@ asteroidOutlines = [
     [(-50,0),(-28,28),(0,50),(28,28),(50,0),(35,-35),(0,-50),(-35,-35)]
 ]
 
+asteroidShapes = [
+    [(0,50),(50,-50),(-50,-50),(-50,50)],
+    [(-50,100),(50,100),(100,0),(50,-100),(-50,-100),(-100,0)],
+    [(-50,100),(50,100),(50,-50),(-50,-100),(-100,50)],
+    [(-50,100),(50,100),(100,50),(50,-50),(-50,-100),(-100,0)],
+    [(0,50),(100,50),(50,-100),(-50,-100),(-50,-50)],
+]
+
+""" asteroidShapes = [
+    [(0,25),(25,-25),(-25,-25),(-25,25)],
+    [(-25,50),(25,50),(50,0),(25,-50),(-25,-50),(-50,0)],
+    [(-25,50),(25,50),(25,-25),(-25,-50),(-50,25)],
+    [(-25,50),(25,50),(50,25),(25,-25),(-25,-50),(-50,0)],
+    [(0,25),(50,25),(25,-50),(-25,-50),(-25,-25)],
+] """
+
 asteroidTypes = [
     "big",
     "medium",
@@ -46,7 +62,7 @@ def appStarted(app):
     app.bg = ImageTk.PhotoImage(bg)
     # timer
     app.lastWaveTime = time.time()
-    app.timeBetweenWaves = 5
+    app.timeBetweenWaves = .5
     app.timerDelay = 1
     app.mouseMovedDelay = 2
 
@@ -63,11 +79,12 @@ def initAsteroids(app):
 
 def spawnAsteroids(app):
     if (time.time() - app.lastWaveTime > app.timeBetweenWaves):
-        spawnAmount = random.randint(2, 4)
+        spawnAmount = max(0,4-len(app.asteroids))
         createWave(app, spawnAmount)
         app.lastWaveTime = time.time()
 
 def createWave(app, amount):
+    if amount == 0: return 
     margin = 50
     newWave = []
     for i in range(amount):
@@ -79,15 +96,16 @@ def createWave(app, amount):
             randomY = random.randint(0 - margin, app.height + margin)
         # random velocity
         if randomX < app.width: 
-            xVector = random.uniform(0,2)
+            xVector = random.uniform(1,1.5)
         else: 
-            xVector = -1 * random.uniform(0,2)
+            xVector = -1 * random.uniform(1,1.5)
         if randomY < app.height: 
-            yVector = random.uniform(0,2)
+            yVector = random.uniform(1,1.5)
         else: 
-            yVector = -1 * random.uniform(0,2)
+            yVector = -1 * random.uniform(1,1.5)
+        asteroidIndex = random.randrange(0, len(asteroidShapes))
         # create random asteroid
-        newWave.append(Asteroid(asteroidOutlines[1], (randomX, randomY), (xVector, yVector), asteroidTypes[1], False))
+        newWave.append(Asteroid(asteroidShapes[asteroidIndex], (randomX, randomY), (xVector, yVector), asteroidTypes[1], False))
     
     app.asteroids.extend(newWave)
 
@@ -126,7 +144,7 @@ def timerFired(app):
 
 def redrawAll(app, canvas):
     drawBackground(app, canvas)
-    drawText(app, canvas)
+    #drawText(app, canvas)
     drawAsteroids(app, canvas)
     # particle
     app.player.show(app, canvas)

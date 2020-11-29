@@ -12,7 +12,7 @@ def appStarted(app):
     app.mouseMovedDelay = 2
 
 def initFlock(app):
-    amount = 20
+    amount = 30
     for i in range(amount):
         pos = [random.randint(0, app.width), random.randint(0, app.height)]
         # gets vector with random direction and magnitude
@@ -30,7 +30,8 @@ def timerFired(app):
         boid.update(app)
 
 def redrawAll(app, canvas):
+    canvas.create_rectangle(0, 0, app.width, app.height, fill = 'black')
     for boid in app.flock:
         boid.show(app, canvas)
 
-runApp(width=1024, height=1024)
+runApp(width=512, height=512)

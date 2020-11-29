@@ -102,8 +102,6 @@ class Player(object):
 
     # moves the particle given a set of inputs 
     def updateMovement(self, inputs):
-        speed = 3
-        rotateSpeed = 2*math.pi/180
         if 'w' in inputs:
             self.updateVelocity()
         if 's' in inputs:
@@ -126,7 +124,7 @@ class Player(object):
             self.movementVector[1] += friction
 
     def updateVelocity(self):
-        maxSpeed = 2
+        maxSpeed = 1
         acceleration = .02
         dx, dy = getVector(self.angle)
         self.movementVector[0] += dx * acceleration
@@ -201,3 +199,7 @@ class Player(object):
         if len(self.intersectList) > 0:
             canvas.create_polygon(self.intersectList, fill = 'white')
         canvas.create_polygon(self.globalPoints, fill = 'black')
+
+    def drawShot(self, app, canvas, point):
+        x, y = point
+        canvas.create_line(self.pos[0],self.pos[1], x, y, fill = 'black', width = 3)

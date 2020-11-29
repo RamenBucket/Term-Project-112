@@ -57,7 +57,7 @@ class Boid(object):
                                             self.maxSpeed == other.maxSpeed)
 
     def allign(self, boids):
-        perceptionRadius = 100
+        perceptionRadius = 50
         steering = [0, 0]
         total = 0
         for boid in boids:
@@ -93,7 +93,7 @@ class Boid(object):
         return steering
 
     def cohesion(self, boids):
-        perceptionRadius = 100
+        perceptionRadius = 50
         steering = [0, 0]
         total = 0
         for boid in boids:
@@ -131,4 +131,4 @@ class Boid(object):
     def show(self, app, canvas):
         r = 5
         cx, cy = self.pos
-        canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill = 'black')
+        canvas.create_rectangle(cx-r, cy-r, cx+r, cy+r, fill = 'white')
