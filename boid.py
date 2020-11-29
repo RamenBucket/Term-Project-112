@@ -32,23 +32,27 @@ def addVectorWrapAround(v1, v2, w, h):
 def multiplyVector(v, n):
     return [v[0] * n, v[1] * n]
 
+def divideVector(v, n):
+    return [v[0] / n, v[1] / n]
+
 def distance(p1, p2):
-    return ((p1[0] - p2[0])**2 + (p1[0] - p2[0])**2)**0.5
+    return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
 class Boid(object):
     def __init__(self, pos, vel, acc):
         self.pos = pos
         self.vel = vel
         self.acc = acc
-        self.maxForce = .0015
-        self.maxCohesionForce = .0015
-        self.maxSpeed = 1
+        self.maxAllignForce = .02
+        self.maxCohesionForce = .02
+        self.maxSeparationForce = .02
+        self.maxSpeed = 2
 
     def __eq__(self, other):
         return isinstance(other, Boid) and (self.pos == other.pos and
                                             self.vel == other.vel and
                                             self.acc == other.acc and
-                                            self.maxForce == other.maxForce and
+                                            self.maxAllignForce == other.maxAllignForce and
                                             self.maxCohesionForce == other.maxCohesionForce and
                                             self.maxSpeed == other.maxSpeed)
 
@@ -61,12 +65,31 @@ class Boid(object):
                 steering = addVector(steering, boid.vel)
                 total += 1
         if total > 0:
-            steering = multiplyVector(steering, 1/total) # divide by total
+            steering = divideVector(steering, total) # divide by total to get average
             steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSpeed)
             steering = subtractVector(steering, self.vel) # subtracting
             # limits the magnitude of alignment
-            if distance([0,0], steering) > self.maxForce:
-                steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxForce)
+            if distance([0,0], steering) > self.maxAllignForce:
+                steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxAllignForce)
+        return steering
+
+    def separation(self, boids):
+        perceptionRadius = 50
+        steering = [0, 0]
+        total = 0
+        for boid in boids:
+            if boid != self and distance(self.pos, boid.pos) < perceptionRadius:
+                diff = subtractVector(self.pos, boid.pos)
+                diff = divideVector(diff, distance(self.pos, boid.pos))
+                steering = addVector(steering, diff)
+                total += 1
+        if total > 0:
+            steering = divideVector(steering, total) # divide by total
+            steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSpeed)
+            steering = subtractVector(steering, self.vel) # subtracting
+            # limits the magnitude of alignment
+            if distance([0,0], steering) > self.maxSeparationForce:
+                steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSeparationForce)
         return steering
 
     def cohesion(self, boids):
@@ -78,7 +101,7 @@ class Boid(object):
                 steering = addVector(steering, boid.pos)
                 total += 1
         if total > 0:
-            steering = multiplyVector(steering, 1/total) # divide by total
+            steering = divideVector(steering, total) # divide by total
             steering = subtractVector(steering, self.pos)
             steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSpeed)
             steering = subtractVector(steering, self.vel) # subtracting
@@ -88,21 +111,24 @@ class Boid(object):
         return steering
 
     def flock(self, boids):
-        self.acc = [0, 0]
         alignment = self.allign(boids)
         cohesion = self.cohesion(boids)
+        separation = self.separation(boids)
         self.acc = addVector(self.acc, alignment)
         self.acc = addVector(self.acc, cohesion)
+        self.acc = addVector(self.acc, separation)
 
     def update(self, app):
         # update position
         self.pos = addVectorWrapAround(self.pos, self.vel, app.width, app.height)
+        #self.pos = addVector(self.pos, self.vel)
         # update velocity
         self.vel = addVector(self.vel, self.acc)
-        if distance([0,0], self.vel) > self.maxSpeed:
+        if distance([0, 0], self.vel) > self.maxSpeed:
             self.vel = multiplyVector(getVector(getAngle(self.vel[0], self.vel[1])), self.maxSpeed)
+        self.acc = [0, 0]
 
     def show(self, app, canvas):
-        r = 10
+        r = 5
         cx, cy = self.pos
         canvas.create_oval(cx-r, cy-r, cx+r, cy+r, fill = 'black')

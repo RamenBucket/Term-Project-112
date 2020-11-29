@@ -25,9 +25,8 @@ def getVector(angle):
     return [math.cos(angle), math.sin(angle)]
 
 def timerFired(app):
-    copyFlock = copy.deepcopy(app.flock)
     for boid in app.flock:
-        boid.flock(copyFlock)
+        boid.flock(app.flock)
         boid.update(app)
 
 def redrawAll(app, canvas):
