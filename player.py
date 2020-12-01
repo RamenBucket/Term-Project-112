@@ -56,8 +56,9 @@ def calculateIntersectList(rayList, asteroidList, boundaryList):
         minCast = None
         minCastDistance = None
         for side in sideList + boundaryList:
-            if ray.cast(side) != None: 
-                intersectX, intersectY = ray.cast(side)
+            castValue = ray.cast(side)
+            if castValue != None: 
+                intersectX, intersectY = castValue
                 currentDistance = distance(intersectX, intersectY, rayX, rayY)
                 if (minCast == None or currentDistance < minCastDistance):
                     minCast = intersectX, intersectY
@@ -178,6 +179,20 @@ class Player(object):
                 self.sliceAsteroid(app, asteroid, i, p0, p1, app.width, app.height)
                 i += 1
             i += 1
+
+    # uses ray casting to determine if a point is in polygon
+    def inAsteroid(self, app):
+        intersectRay = Ray((self.pos[0], self.pos[1]))
+        intersectRay.lookAt(app.width + 100, app.height + 100)
+        for asteroid in app.asteroids:
+            numIntersections = 0
+            for side in asteroid.sides:
+                castValue = intersectRay.cast(side)
+                if castValue != None:
+                    numIntersections += 1
+            if numIntersections % 2 == 1:
+                return True
+        return False
 
     def getBoundaryIntersection(self, app):
         vectorX, vectorY = getVector(self.angle)

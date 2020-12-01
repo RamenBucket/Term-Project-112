@@ -7,7 +7,7 @@ import copy
 
 def appStarted(app):
     app.asteroids = []
-    app.asteroids.append(Asteroid([(-50,0),(-35,35),(0,50),(35,35),(50,0),(35,-35),(0,-50),(-35,-35)], (app.width/2, app.height/2), (0,0), "medium", False))
+    #app.asteroids.append(Asteroid([(-50,0),(-35,35),(0,50),(35,35),(50,0),(35,-35),(0,-50),(-35,-35)], (app.width/2, app.height/2), (0,0), "medium", False))
     app.flock = []
     initFlock(app)
     # timer

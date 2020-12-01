@@ -19,6 +19,9 @@ asteroidOutlines = [
     [(-50,0),(-28,28),(0,50),(28,28),(50,0),(35,-35),(0,-50),(-35,-35)]
 ]
 
+#####################
+# recalculate centroids for asteroid shapes
+#####################
 asteroidShapes = [
     [(0,50),(50,-50),(-50,-50),(-50,50)],
     [(-50,100),(50,100),(100,0),(50,-100),(-50,-100),(-100,0)],
@@ -27,6 +30,7 @@ asteroidShapes = [
     [(0,50),(100,50),(50,-100),(-50,-100),(-50,-50)],
 ]
 
+# below is 2x smaller version of above
 """ asteroidShapes = [
     [(0,25),(25,-25),(-25,-25),(-25,25)],
     [(-25,50),(25,50),(50,0),(25,-50),(-25,-50),(-50,0)],
@@ -46,7 +50,7 @@ playerShape = [[0,-20],[10,10],[0,5],[-10,10]]
 def appStarted(app):
     # asteroids
     app.asteroids = []
-    #initAsteroids(app)
+    initAsteroids(app)
     # boundary
     app.boundaryList = [PolygonSide((0,0),(app.width,0)),
                         PolygonSide((app.width,0),(app.width,app.height)),
@@ -57,7 +61,7 @@ def appStarted(app):
     playerAngle = math.pi/2
     app.player = Player(playerPos, playerAngle, playerShape)
     app.inputs = set()
-    # background
+    # backgrounds
     bg = app.loadImage('space_bg.png')
     app.bg = ImageTk.PhotoImage(bg)
     # timer
@@ -133,12 +137,15 @@ def keyReleased(app, event):
         app.inputs.remove(event.key)
 
 def timerFired(app):
-    spawnAsteroids(app)
+    #spawnAsteroids(app)
     # asteroid run first for update raycasting when slicing
     for asteroid in app.asteroids:
         asteroid.move()
 
     app.player.update(app)
+
+    if app.player.inAsteroid(app):
+        print("ded")
 
     removeAsteroids(app)
 
@@ -160,6 +167,6 @@ def drawAsteroids(app, canvas):
     for asteroid in app.asteroids:
         asteroidX, asteroidY = asteroid.pos
         coords = localToGlobal(asteroid.points, asteroidX, asteroidY)
-        canvas.create_polygon(coords, outline = 'white', fill = "black", width = 1)
+        canvas.create_polygon(coords, outline = 'white', width = 1)
 
 runApp(width=1024, height=1024)

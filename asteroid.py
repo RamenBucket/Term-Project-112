@@ -5,7 +5,8 @@ import sliceFunction
 from polygonSide import PolygonSide
 
 def getVelVectors(slope):
-        vel = 2 #magnitude of velocity imparted
+        vel = 1.1 #magnitude of velocity imparted 
+        # ^^^^^^^^^^^ maybe change it so it is based off the velocity of the asteroid
         angle = math.atan(slope)
         vx1, vy1 = math.cos(angle)*vel,math.sin(angle)*vel
         #vx2, vy2 = math.cos(angle+math.pi)*vel,math.sin(angle+math.pi)*vel
