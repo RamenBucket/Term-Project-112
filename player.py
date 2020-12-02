@@ -3,6 +3,7 @@ from polygonSide import PolygonSide
 import sliceFunction
 import math
 import copy
+import time
 
 # calculate the orientation of rays given center, asteroids, and width and height of the screen
 def calculateRays(width, height, particlePos, asteroidList):
@@ -93,12 +94,16 @@ def localToGlobal(points, cx, cy): # centroid coordinates to canvas
 
 class Player(object):
     # pos is a list of x and y and angle in the direction in radians
-    def __init__(self, pos, angle, points):
+    def __init__(self, pos, angle, points, health):
         self.pos = pos
         self.angle = angle
         self.points = points
         self.movementVector = [0,0]
         self.globalPoints = localToGlobal(self.points, pos[0], pos[1])
+        self.health = health
+        self.maxhealth = health
+        self.score = 0
+        # raycasting
         self.intersectList = []
 
     # moves the particle given a set of inputs 
@@ -169,30 +174,25 @@ class Player(object):
         self.updateIntersectList(app)
 
     def shoot(self, app):
-        p0 = self.pos
+        p0 = copy.deepcopy(self.pos)
         p1 = self.getBoundaryIntersection(app)
+        self.applyShootForce()
         i = 0
         while i < len(app.asteroids):
             asteroid = app.asteroids[i]
             ax, ay = asteroid.pos
             if(sliceFunction.sliceIntersectsPolygon(asteroid.globalPoints, p0, p1)):
+                self.score += 100
                 self.sliceAsteroid(app, asteroid, i, p0, p1, app.width, app.height)
                 i += 1
             i += 1
+        return p0, p1
 
-    # uses ray casting to determine if a point is in polygon
-    def inAsteroid(self, app):
-        intersectRay = Ray((self.pos[0], self.pos[1]))
-        intersectRay.lookAt(app.width + 100, app.height + 100)
-        for asteroid in app.asteroids:
-            numIntersections = 0
-            for side in asteroid.sides:
-                castValue = intersectRay.cast(side)
-                if castValue != None:
-                    numIntersections += 1
-            if numIntersections % 2 == 1:
-                return True
-        return False
+    def applyShootForce(self):
+        force = 1
+        forceVector = getVector(self.angle + math.pi)
+        self.movementVector[0] += forceVector[0] * force
+        self.movementVector[1] -= forceVector[1] * force
 
     def getBoundaryIntersection(self, app):
         vectorX, vectorY = getVector(self.angle)
@@ -210,11 +210,41 @@ class Player(object):
         app.asteroids.insert(i,asteroid1)
         app.asteroids.insert(i,asteroid2)
 
+    # uses ray casting to determine if a point is in polygon
+    def inAsteroid(self, app):
+        intersectRay = Ray((self.pos[0], self.pos[1]))
+        intersectRay.lookAt(app.width + 100, app.height + 100)
+        for asteroid in app.asteroids:
+            numIntersections = 0
+            for side in asteroid.sides:
+                castValue = intersectRay.cast(side)
+                if castValue != None:
+                    numIntersections += 1
+            if numIntersections % 2 == 1:
+                return True
+        return False
+
+    def removeHealth(self, amount):
+        self.health -= amount
+
     def show(self, app, canvas):
         if len(self.intersectList) > 0:
             canvas.create_polygon(self.intersectList, fill = 'white')
         canvas.create_polygon(self.globalPoints, fill = 'black')
 
-    def drawShot(self, app, canvas, point):
-        x, y = point
-        canvas.create_line(self.pos[0],self.pos[1], x, y, fill = 'black', width = 3)
+    def drawHealth(self, app, canvas):
+        baseMargin = 10
+        baseLength = app.width/4
+        baseWidth = 20
+        canvas.create_rectangle(baseMargin, baseMargin, baseMargin + baseLength, baseMargin + baseWidth, fill = 'black')
+        healthMargin = 1
+        healthLength = (baseLength - (2 * healthMargin)) * self.health/self.maxhealth
+        canvas.create_rectangle(baseMargin + healthMargin, 
+                                baseMargin + healthMargin, 
+                                baseMargin + healthMargin + healthLength, 
+                                baseMargin + baseWidth - healthMargin, 
+                                fill = 'white')
+    
+    def drawScore(self, app, canvas):
+        margin = 10
+        canvas.create_text(app.width - margin, margin, anchor = "ne", text = self.score, font= 'System 18')

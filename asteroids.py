@@ -12,11 +12,7 @@ import random
 
 asteroidOutlines = [
     [(-50,0),(-35,35),(0,50),(35,35),(50,0),(35,-35),(0,-50),(-35,-35)],
-    [(50,50),(50,-50),(-50,-50),(-50,50)],
-    [(-100,0),(-70,70),(0,100),(70,70),(100,0),(70,-70),(0,-100),(-70,-70)],
-    [(-50,0),(-35,30),(0,40),(35,30),(50,0),(35,-30),(0,-40),(-35,-30)],
-    [(-50,0),(-35,30),(0,40),(35,30),(50,0),(35,-30),(0,-40),(-35,-30)],
-    [(-50,0),(-28,28),(0,50),(28,28),(50,0),(35,-35),(0,-50),(-35,-35)]
+    [(50,50),(50,-50),(-50,-50),(-50,50)]
 ]
 
 #####################
@@ -39,18 +35,11 @@ asteroidShapes = [
     [(0,25),(50,25),(25,-50),(-25,-50),(-25,-25)],
 ] """
 
-asteroidTypes = [
-    "big",
-    "medium",
-    "small"
-]
-
 playerShape = [[0,-20],[10,10],[0,5],[-10,10]]
 
 def appStarted(app):
     # asteroids
     app.asteroids = []
-    initAsteroids(app)
     # boundary
     app.boundaryList = [PolygonSide((0,0),(app.width,0)),
                         PolygonSide((app.width,0),(app.width,app.height)),
@@ -59,8 +48,17 @@ def appStarted(app):
     # player
     playerPos = [app.width/2, app.height/2]
     playerAngle = math.pi/2
-    app.player = Player(playerPos, playerAngle, playerShape)
+    playerHealth = 100
+    app.player = Player(playerPos, playerAngle, playerShape, playerHealth)
     app.inputs = set()
+    # player shooting
+    app.shotP1 = None
+    app.shotP2 = None
+    app.lastShotTime = None
+    app.totalShotTime = .5
+    app.playerIsShooting = False
+    app.lastRemoveHealthTime = time.time()
+    app.totalRemoveHealthTime = 2
     # backgrounds
     bg = app.loadImage('space_bg.png')
     app.bg = ImageTk.PhotoImage(bg)
@@ -69,17 +67,6 @@ def appStarted(app):
     app.timeBetweenWaves = .5
     app.timerDelay = 1
     app.mouseMovedDelay = 2
-
-# ititalizes asteroid objects
-def initAsteroids(app):
-    newAsteroid = Asteroid(asteroidOutlines[1], (app.width/2, app.height/4), (0,0), asteroidTypes[1], False)
-    newAsteroid1 = Asteroid(asteroidOutlines[0], (app.width/4, app.height/2), (0,0), asteroidTypes[1], False)
-    newAsteroid2 = Asteroid(asteroidOutlines[1], (app.width/2, 3*app.height/4), (0,0), asteroidTypes[1], False)
-    newAsteroid3 = Asteroid(asteroidOutlines[0], (3*app.width/4, app.height/2), (0,0), asteroidTypes[1], False)
-    app.asteroids.append(newAsteroid)
-    app.asteroids.append(newAsteroid1)
-    app.asteroids.append(newAsteroid2)
-    app.asteroids.append(newAsteroid3)
 
 def spawnAsteroids(app):
     if (time.time() - app.lastWaveTime > app.timeBetweenWaves):
@@ -109,7 +96,7 @@ def createWave(app, amount):
             yVector = -1 * random.uniform(1,1.5)
         asteroidIndex = random.randrange(0, len(asteroidShapes))
         # create random asteroid
-        newWave.append(Asteroid(asteroidShapes[asteroidIndex], (randomX, randomY), (xVector, yVector), asteroidTypes[1], False))
+        newWave.append(Asteroid(asteroidShapes[asteroidIndex], (randomX, randomY), (xVector, yVector), False))
     
     app.asteroids.extend(newWave)
 
@@ -129,7 +116,15 @@ def keyPressed(app, event):
     if event.key in controls:
         app.inputs.add(event.key)
     if event.key == 'Space':
-        app.player.shoot(app)
+        if not app.playerIsShooting:
+            app.shotP1, app.shotP2 = app.player.shoot(app)
+            app.lastShotTime = time.time()
+            app.playerIsShooting = True
+
+def shotTimer(app):
+    if app.playerIsShooting:
+        if (app.lastShotTime == None) or (time.time() - app.lastShotTime > app.totalShotTime):
+            app.playerIsShooting = False
     
 def keyReleased(app, event):
     controls = {'w', 'a', 's', 'd', 'q', 'e'}
@@ -137,17 +132,20 @@ def keyReleased(app, event):
         app.inputs.remove(event.key)
 
 def timerFired(app):
-    #spawnAsteroids(app)
+    spawnAsteroids(app)
     # asteroid run first for update raycasting when slicing
     for asteroid in app.asteroids:
         asteroid.move()
-
     app.player.update(app)
-
+    shotTimer(app)
     if app.player.inAsteroid(app):
-        print("ded")
-
+        doRemoveHealth(app)
     removeAsteroids(app)
+
+def doRemoveHealth(app):
+    if (time.time() - app.lastRemoveHealthTime > app.totalRemoveHealthTime):
+        app.lastRemoveHealthTime = time.time()
+        app.player.removeHealth(10)
 
 def redrawAll(app, canvas):
     drawBackground(app, canvas)
@@ -155,13 +153,22 @@ def redrawAll(app, canvas):
     drawAsteroids(app, canvas)
     # particle
     app.player.show(app, canvas)
+    # player shot
+    if app.playerIsShooting:
+        x0, y0 = app.shotP1
+        x1, y1 = app.shotP2
+        # width part makes the line shrink after it it shot
+        canvas.create_line(x0, y0, x1, y1, fill = 'black', width = app.totalShotTime / ((time.time() - app.lastShotTime) + .01))
+
+    app.player.drawHealth(app, canvas)
+    app.player.drawScore(app, canvas)
 
 def drawBackground(app, canvas):
     canvas.create_image(app.width/2, app.height/2, image = app.bg)
 
 def drawText(app, canvas):
     message = 'The shadows prove the light.'
-    canvas.create_text(app.width/2,app.height/2, text=message, font='System', fill = "white")
+    canvas.create_text(app.width/2, app.height/2, text=message, font='System', fill = "white")
 
 def drawAsteroids(app, canvas):
     for asteroid in app.asteroids:

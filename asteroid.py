@@ -5,12 +5,10 @@ import sliceFunction
 from polygonSide import PolygonSide
 
 def getVelVectors(slope):
-        vel = 1.1 #magnitude of velocity imparted 
-        # ^^^^^^^^^^^ maybe change it so it is based off the velocity of the asteroid
+        vel = 1.1 # magnitude of velocity imparted 
         angle = math.atan(slope)
         vx1, vy1 = math.cos(angle)*vel,math.sin(angle)*vel
-        #vx2, vy2 = math.cos(angle+math.pi)*vel,math.sin(angle+math.pi)*vel
-        return (vx1,vy1)#,(vx2,vy2) #first coordinate is always on the right
+        return (vx1, vy1) # first coordinate is always on the right
 
 def globalToLocal(points,cx,cy): #canvas coordinates to centroid
     result = copy.deepcopy(points)
@@ -38,14 +36,13 @@ def getSides(points):
     return sideList
 
 class Asteroid(object):
-    def __init__(self, points, pos, vel, asteroidType, uncut):
+    def __init__(self, points, pos, vel, uncut):
         self.points = points
         self.pos = pos
         cx, cy = pos
         self.globalPoints = localToGlobal(self.points,cx,cy)
         self.sides = getSides(self.globalPoints)
         self.vel = vel
-        self.asteroidType = asteroidType
         self.uncut = uncut
     
     def slice(self, p0, p1, width, height):
@@ -96,8 +93,8 @@ class Asteroid(object):
             vel1 = (vx-dvx, vy-dvy) 
             vel2 = (vx+dvx, vy+dvy)
 
-        f1 = Asteroid(points1,pos1,vel1,self.asteroidType,False)
-        f2 = Asteroid(points2,pos2,vel2,self.asteroidType,False)
+        f1 = Asteroid(points1, pos1, vel1, False)
+        f2 = Asteroid(points2, pos2, vel2, False)
         return (f1, f2)
 
     def move(self): #grav = pixels/frame, pre-calculated
