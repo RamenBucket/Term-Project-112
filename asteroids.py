@@ -1,5 +1,6 @@
 from cmu_112_graphics import *
 from asteroid import *
+from boid import *
 from ray import Ray, getAngle, getVector
 from polygonSide import PolygonSide
 from player import Player
@@ -57,8 +58,12 @@ def appStarted(app):
     app.lastShotTime = None
     app.totalShotTime = .5
     app.playerIsShooting = False
+    # player health
     app.lastRemoveHealthTime = time.time()
-    app.totalRemoveHealthTime = 2
+    app.totalRemoveHealthTime = .05
+    # aliens
+    app.flock = []
+    initFlock(app)
     # backgrounds
     bg = app.loadImage('space_bg.png')
     app.bg = ImageTk.PhotoImage(bg)
@@ -68,9 +73,19 @@ def appStarted(app):
     app.timerDelay = 1
     app.mouseMovedDelay = 2
 
+def initFlock(app):
+    amount = 20
+    for i in range(amount):
+        pos = [random.randint(0, app.width), random.randint(0, app.height)]
+        # gets vector with random direction and magnitude
+        vel = multiplyVector(getVector(random.uniform(0, 2*math.pi)), random.uniform(.5, 1))
+        acc = [0, 0]
+        app.flock.append(Boid(pos, vel, acc))
+
 def spawnAsteroids(app):
+    maxAsteroids = 3
     if (time.time() - app.lastWaveTime > app.timeBetweenWaves):
-        spawnAmount = max(0,4-len(app.asteroids))
+        spawnAmount = max(0,maxAsteroids - len(app.asteroids))
         createWave(app, spawnAmount)
         app.lastWaveTime = time.time()
 
@@ -140,12 +155,15 @@ def timerFired(app):
     shotTimer(app)
     if app.player.inAsteroid(app):
         doRemoveHealth(app)
+    for boid in app.flock:
+        boid.flock(app.flock, app.asteroids, app.player)
+        boid.update(app)
     removeAsteroids(app)
 
 def doRemoveHealth(app):
     if (time.time() - app.lastRemoveHealthTime > app.totalRemoveHealthTime):
         app.lastRemoveHealthTime = time.time()
-        app.player.removeHealth(10)
+        app.player.removeHealth(1)
 
 def redrawAll(app, canvas):
     drawBackground(app, canvas)
@@ -159,7 +177,8 @@ def redrawAll(app, canvas):
         x1, y1 = app.shotP2
         # width part makes the line shrink after it it shot
         canvas.create_line(x0, y0, x1, y1, fill = 'black', width = app.totalShotTime / ((time.time() - app.lastShotTime) + .01))
-
+    for boid in app.flock:
+        boid.show(app, canvas)
     app.player.drawHealth(app, canvas)
     app.player.drawScore(app, canvas)
 

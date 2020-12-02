@@ -1,4 +1,6 @@
+from asteroid import Asteroid
 import math
+import random
 
 def getAngle(x, y):
     # if the line is vertial
@@ -57,7 +59,7 @@ class Boid(object):
                                             self.maxSpeed == other.maxSpeed)
 
     def allign(self, boids):
-        perceptionRadius = 50
+        perceptionRadius = 100
         steering = [0, 0]
         total = 0
         for boid in boids:
@@ -74,7 +76,7 @@ class Boid(object):
         return steering
 
     def separation(self, boids):
-        perceptionRadius = 50
+        perceptionRadius = 100
         steering = [0, 0]
         total = 0
         for boid in boids:
@@ -93,8 +95,8 @@ class Boid(object):
         return steering
 
     def asteroidSeparation(self, asteroids):
-        maxSeparationForceAsteroids = .03
-        perceptionRadius = 100
+        maxSeparationForceAsteroids = .04
+        perceptionRadius = 200
         steering = [0, 0]
         total = 0
         separationWeight = 5
@@ -113,8 +115,46 @@ class Boid(object):
                 steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), maxSeparationForceAsteroids)
         return steering
 
+    def playerSeparation(self, player):
+        maxSeparationForcePlayer = .03
+        perceptionRadius = 200
+        steering = [0, 0]
+        total = 0
+        separationWeight = 5
+        if distance(self.pos, player.pos) < perceptionRadius:
+            diff = multiplyVector(subtractVector(self.pos, player.pos), separationWeight)
+            diff = multiplyVector(divideVector(diff, distance(self.pos, player.pos)), separationWeight)
+            steering = addVector(steering, diff)
+            total += 1 * separationWeight
+        if total > 0:
+            steering = divideVector(steering, total) # divide by total
+            steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSpeed)
+            steering = subtractVector(steering, self.vel) # subtracting
+            # limits the magnitude of alignment
+            if distance([0,0], steering) > maxSeparationForcePlayer:
+                steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), maxSeparationForcePlayer)
+        return steering
+
+    def playerCohesion(self, player):
+        maxCohesionForcePlayer = .01
+        perceptionRadius = 500
+        steering = [0, 0]
+        total = 0
+        if distance(self.pos, player.pos) < perceptionRadius:
+            steering = addVector(steering, player.pos)
+            total += 1
+        if total > 0:
+            steering = divideVector(steering, total) # divide by total
+            steering = subtractVector(steering, self.pos)
+            steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxSpeed)
+            steering = subtractVector(steering, self.vel) # subtracting
+            # limits the magnitude of alignment
+            if distance([0,0], steering) > maxCohesionForcePlayer:
+                steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), maxCohesionForcePlayer)
+        return steering
+
     def cohesion(self, boids):
-        perceptionRadius = 50
+        perceptionRadius = 100
         steering = [0, 0]
         total = 0
         for boid in boids:
@@ -131,15 +171,19 @@ class Boid(object):
                 steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxCohesionForce)
         return steering
 
-    def flock(self, boids, asteroids):
+    def flock(self, boids, asteroids, player):
         alignment = self.allign(boids)
         cohesion = self.cohesion(boids)
         separation = self.separation(boids)
         asteroidSeparation = self.asteroidSeparation(asteroids)
+        playerSeparation = self.playerSeparation(player)
+        playerCohesion = self.playerCohesion(player)
         self.acc = addVector(self.acc, alignment)
         self.acc = addVector(self.acc, cohesion)
         self.acc = addVector(self.acc, separation)
         self.acc = addVector(self.acc, asteroidSeparation)
+        self.acc = addVector(self.acc, playerSeparation)
+        self.acc = addVector(self.acc, playerCohesion)
 
     def update(self, app):
         # update position
@@ -152,6 +196,6 @@ class Boid(object):
         self.acc = [0, 0]
 
     def show(self, app, canvas):
-        r = 5
+        r = 7
         cx, cy = self.pos
-        canvas.create_rectangle(cx-r, cy-r, cx+r, cy+r, fill = 'white')
+        canvas.create_rectangle(cx-r, cy-r, cx+r, cy+r)

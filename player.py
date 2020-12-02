@@ -237,7 +237,7 @@ class Player(object):
         baseLength = app.width/4
         baseWidth = 20
         canvas.create_rectangle(baseMargin, baseMargin, baseMargin + baseLength, baseMargin + baseWidth, fill = 'black')
-        healthMargin = 1
+        healthMargin = .8
         healthLength = (baseLength - (2 * healthMargin)) * self.health/self.maxhealth
         canvas.create_rectangle(baseMargin + healthMargin, 
                                 baseMargin + healthMargin, 
