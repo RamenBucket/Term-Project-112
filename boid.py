@@ -2,6 +2,8 @@ from asteroid import Asteroid
 import math
 import random
 
+shotOutline = [(5,5),(5,-5),(-5,-5),(-5,5)]
+
 def getAngle(x, y):
     # if the line is vertial
     if x == 0 and y <= 0:
@@ -194,6 +196,15 @@ class Boid(object):
         if distance([0, 0], self.vel) > self.maxSpeed:
             self.vel = multiplyVector(getVector(getAngle(self.vel[0], self.vel[1])), self.maxSpeed)
         self.acc = [0, 0]
+
+    def shoot(self, app):
+        shotSpeed = 3
+        totalDistance = distance(app.player.pos, self.pos)
+        if totalDistance < 100:
+            randomNum = random.randint(1,20)
+            if randomNum == 1:
+                vector = multiplyVector(divideVector(subtractVector(app.player.pos, self.pos), totalDistance), shotSpeed)
+                app.alienShots.append(Asteroid(shotOutline, self.pos, vector, False))
 
     def show(self, app, canvas):
         r = 7

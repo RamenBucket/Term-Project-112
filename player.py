@@ -214,9 +214,10 @@ class Player(object):
     def inAsteroid(self, app):
         intersectRay = Ray((self.pos[0], self.pos[1]))
         intersectRay.lookAt(app.width + 100, app.height + 100)
-        for asteroid in app.asteroids:
+        projectileList = app.asteroids + app.alienShots
+        for projectile in projectileList:
             numIntersections = 0
-            for side in asteroid.sides:
+            for side in projectile.sides:
                 castValue = intersectRay.cast(side)
                 if castValue != None:
                     numIntersections += 1

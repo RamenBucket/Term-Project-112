@@ -64,6 +64,7 @@ def appStarted(app):
     # aliens
     app.flock = []
     initFlock(app)
+    app.alienShots = []
     # backgrounds
     bg = app.loadImage('space_bg.png')
     app.bg = ImageTk.PhotoImage(bg)
@@ -74,7 +75,7 @@ def appStarted(app):
     app.mouseMovedDelay = 2
 
 def initFlock(app):
-    amount = 20
+    amount = 15
     for i in range(amount):
         pos = [random.randint(0, app.width), random.randint(0, app.height)]
         # gets vector with random direction and magnitude
@@ -126,6 +127,17 @@ def removeAsteroids(app):
         else:
             i += 1
 
+def removeShots(app):
+    margin = 50
+    i = 0
+    while i < len(app.alienShots):
+        shot = app.alienShots[i]
+        x, y = shot.pos
+        if not (0 - margin <= x <= app.width + margin) or not (0 - margin <= y <= app.height):
+            app.alienShots.pop(i)
+        else:
+            i += 1
+
 def keyPressed(app, event):
     controls = {'w', 'a', 's', 'd', 'q', 'e'}
     if event.key in controls:
@@ -158,7 +170,11 @@ def timerFired(app):
     for boid in app.flock:
         boid.flock(app.flock, app.asteroids, app.player)
         boid.update(app)
+        boid.shoot(app)
+    for shot in app.alienShots:
+        shot.move()
     removeAsteroids(app)
+    removeShots(app)
 
 def doRemoveHealth(app):
     if (time.time() - app.lastRemoveHealthTime > app.totalRemoveHealthTime):
@@ -179,6 +195,7 @@ def redrawAll(app, canvas):
         canvas.create_line(x0, y0, x1, y1, fill = 'black', width = app.totalShotTime / ((time.time() - app.lastShotTime) + .01))
     for boid in app.flock:
         boid.show(app, canvas)
+    drawAlienShots(app, canvas)
     app.player.drawHealth(app, canvas)
     app.player.drawScore(app, canvas)
 
@@ -193,6 +210,12 @@ def drawAsteroids(app, canvas):
     for asteroid in app.asteroids:
         asteroidX, asteroidY = asteroid.pos
         coords = localToGlobal(asteroid.points, asteroidX, asteroidY)
+        canvas.create_polygon(coords, outline = 'white', width = 1)
+
+def drawAlienShots(app, canvas):
+    for shot in app.alienShots:
+        shotX, shotY = shot.pos
+        coords = localToGlobal(shot.points, shotX, shotY)
         canvas.create_polygon(coords, outline = 'white', width = 1)
 
 runApp(width=1024, height=1024)
