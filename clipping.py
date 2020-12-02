@@ -18,7 +18,7 @@ def clip(subjectPolygon, clipPolygon):
         cp2 = clipVertex
         inputList = outputList
         outputList = []
-        if len(inputList) == 0: return
+        if inputList == None: return
         s = inputList[-1]
  
         for subjectVertex in inputList:
