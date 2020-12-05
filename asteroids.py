@@ -52,7 +52,7 @@ class GameMode(Mode):
         mode.totalRemoveHealthTime = .05
         # aliens
         mode.flock = []
-        mode.initFlock()
+        mode.initFlock(15)
         mode.alienShots = []
         # backgrounds
         bg = mode.loadImage('space_bg.png')
@@ -61,8 +61,7 @@ class GameMode(Mode):
         mode.lastWaveTime = time.time()
         mode.timeBetweenWaves = .5
 
-    def initFlock(mode):
-        amount = 15
+    def initFlock(mode, amount):
         for i in range(amount):
             pos = [random.randint(0, mode.width), random.randint(0, mode.height)]
             # gets vector with random direction and magnitude
@@ -142,7 +141,7 @@ class GameMode(Mode):
         while i < len(mode.asteroids):
             asteroid = mode.asteroids[i]
             x, y = asteroid.pos
-            if not (0 - margin <= x <= mode.width + margin) or not (0 - margin <= y <= mode.height):
+            if not (0 - margin <= x <= mode.width + margin) or not (0 - margin <= y <= mode.height) or asteroid.area < 1000:
                 mode.asteroids.pop(i)
             else:
                 i += 1
@@ -265,7 +264,7 @@ class SplashScreenMode(Mode):
                             PolygonSide((0,mode.height),(0,0))]
         # aliens
         mode.flock = []
-        mode.initFlock()
+        mode.initFlock(15)
         mode.alienShots = []
         # backgrounds
         bg = mode.loadImage('space_bg.png')
@@ -277,8 +276,7 @@ class SplashScreenMode(Mode):
         mode.lastWaveTime = time.time()
         mode.timeBetweenWaves = .5
 
-    def initFlock(mode):
-        amount = 15
+    def initFlock(mode, amount):
         for i in range(amount):
             pos = [random.randint(0, mode.width), random.randint(0, mode.height)]
             # gets vector with random direction and magnitude
@@ -350,7 +348,7 @@ class SplashScreenMode(Mode):
         while i < len(mode.asteroids):
             asteroid = mode.asteroids[i]
             x, y = asteroid.pos
-            if not (0 - margin <= x <= mode.width + margin) or not (0 - margin <= y <= mode.height):
+            if not (0 - margin <= x <= mode.width + margin) or not (0 - margin <= y <= mode.height) or asteroid.area < 1000:
                 mode.asteroids.pop(i)
             else:
                 i += 1

@@ -227,8 +227,8 @@ class Player(object):
 
     def handleExplosion(self, app, asteroid):
         asteroidDistance = distance(self.pos[0], self.pos[1], asteroid.pos[0], asteroid.pos[1])
-        angleRange = 45 * math.pi/180 # 45 degrees
-        amount = random.randint(5, 10)
+        angleRange = 60 * math.pi/180 # 60 degrees
+        amount = random.randint(4, 7)
         for i in range(amount):
             # position
             x, y = getVector(self.angle)
@@ -243,7 +243,7 @@ class Player(object):
             newShape = copy.deepcopy(app.asteroidShapes[shapeIndex])
             for i in range(len(newShape)):
                 point = newShape[i]
-                point = divideVector(point, 10)
+                point = divideVector(point, 75000/asteroid.area+1)
                 newShape[i] = point
             # add explosion
             app.explosions.append(Asteroid(newShape, positionVector, (dx, -dy), False))

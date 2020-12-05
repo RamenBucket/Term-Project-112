@@ -5,7 +5,7 @@ import sliceFunction
 from polygonSide import PolygonSide
 
 def getVelVectors(slope):
-        vel = 1.1 # magnitude of velocity imparted 
+        vel = 1.3 # magnitude of velocity imparted 
         angle = math.atan(slope)
         vx1, vy1 = math.cos(angle)*vel,math.sin(angle)*vel
         return (vx1, vy1) # first coordinate is always on the right
@@ -45,10 +45,20 @@ def getSides(points):
         sideList.append(side)
     return sideList
 
+def getArea(points):
+    total = 0
+    # iterates throug the list, and adds based on the formula
+    for i in range(len(points)):
+        x1, y1 =  points[i]
+        x2, y2 = points[(i + 1) % len(points)] # mod here is for wrap around
+        total += (x1 * y2) - (y1 * x2)
+    return abs(total / 2)
+
 class Asteroid(object):
     def __init__(self, points, pos, vel, uncut):
         self.pos = pos
         self.points = shiftPoints(points)
+        self.area = getArea(points)
         cx, cy = pos
         self.globalPoints = localToGlobal(self.points,cx,cy)
         self.sides = getSides(self.globalPoints)
@@ -96,11 +106,6 @@ class Asteroid(object):
         vel1, vel2 = self.vel, self.vel # initialize vars
 
         (x1, y1), (x2, y2) = pos1, pos2 # original positions
-
-        """ (cutX0, cutY0), (cutX1, cutY1) = p0, p1
-        v1 = (cutX1-cutX0, cutY1-cutX1)
-        v2 = (cutX1-self.pos[0], -1*(cutY1-self.pos[1]))
-        xp = v1[0]*v2[1] - v1[1]*v2[0] # cross product based on shot vector """
 
         if(x1>x2): # poly1 is moving to the right
             vel1 = (vx+dvx, vy+dvy) 
