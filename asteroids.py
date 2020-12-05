@@ -1,3 +1,9 @@
+# Sources
+# https://www.red3d.com/cwr/boids/
+# https://github.com/RamenBucket/112-Hackathon-20
+# https://ncase.me/sight-and-light/
+# https://thecodingtrain.com/CodingChallenges/124-flocking-boids
+
 from cmu_112_graphics import *
 from asteroid import *
 from boid import *
