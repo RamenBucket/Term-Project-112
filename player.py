@@ -1,9 +1,11 @@
 from ray import *
 from polygonSide import PolygonSide
+from asteroid import Asteroid
 import sliceFunction
 import math
 import copy
 import time
+import random
 
 # calculate the orientation of rays given center, asteroids, and width and height of the screen
 def calculateRays(width, height, particlePos, asteroidList):
@@ -91,6 +93,18 @@ def localToGlobal(points, cx, cy): # centroid coordinates to canvas
         x, y = result[i]
         result[i] = [x+cx, y+cy]
     return result
+
+def addVector(v1, v2):
+    return [v1[0] + v2[0], v1[1] + v2[1]]
+
+def subtractVector(v1, v2):
+    return [v1[0] - v2[0], v1[1] - v2[1]]
+
+def multiplyVector(v, n):
+    return [v[0] * n, v[1] * n]
+
+def divideVector(v, n):
+    return [v[0] / n, v[1] / n]
 
 class Player(object):
     # pos is a list of x and y and angle in the direction in radians
@@ -209,6 +223,23 @@ class Player(object):
         app.asteroids.pop(i)
         app.asteroids.insert(i,asteroid1)
         app.asteroids.insert(i,asteroid2)
+        self.handleExplosion(app, asteroid)
+
+    def handleExplosion(self, app, asteroid):
+        asteroidDistance = distance(self.pos[0], self.pos[1], asteroid.pos[0], asteroid.pos[1])
+        angleRange = 45 * math.pi/180 # 45 degrees
+        amount = random.randint(5, 10)
+        for i in range(amount):
+            # position
+            x, y = getVector(self.angle)
+            positionVector = addVector(multiplyVector((x, -y), asteroidDistance), self.pos)
+            # velocity
+            randomAngle = self.angle + random.uniform(-angleRange, angleRange)
+            velocity = random.uniform(1, 5)
+            velocityVector = multiplyVector(getVector(randomAngle), velocity)
+            dx, dy = velocityVector
+            # add explosion
+            app.explosions.append(Asteroid([(5,5),(5,-5),(-5,-5),(-5,5)], positionVector, (dx, -dy), False))
 
     # uses ray casting to determine if a point is in polygon
     def inAsteroid(self, app):
