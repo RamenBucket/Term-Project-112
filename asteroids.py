@@ -83,6 +83,7 @@ class GameMode(Mode):
     def keyReleased(mode, event):
         controls = {'w', 'a', 's', 'd'}
         if event.key in controls:
+            mode.inputs.add(event.key) # for error when switching app modes
             mode.inputs.remove(event.key)
 
     def timerFired(mode):
