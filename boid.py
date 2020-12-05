@@ -2,7 +2,7 @@ from asteroid import Asteroid
 import math
 import random
 
-shotOutline = [(5,5),(5,-5),(-5,-5),(-5,5)]
+shotOutline = [(0,5),(5,0),(0,-5),(-5,0)]
 
 def getAngle(x, y):
     # if the line is vertial
@@ -173,19 +173,21 @@ class Boid(object):
                 steering = multiplyVector(getVector(getAngle(steering[0], steering[1])), self.maxCohesionForce)
         return steering
 
-    def flock(self, boids, asteroids, player):
+    def flock(self, boids, asteroids, player=None):
         alignment = self.allign(boids)
         cohesion = self.cohesion(boids)
         separation = self.separation(boids)
         asteroidSeparation = self.asteroidSeparation(asteroids)
-        playerSeparation = self.playerSeparation(player)
-        playerCohesion = self.playerCohesion(player)
+        
         self.acc = addVector(self.acc, alignment)
         self.acc = addVector(self.acc, cohesion)
         self.acc = addVector(self.acc, separation)
         self.acc = addVector(self.acc, asteroidSeparation)
-        self.acc = addVector(self.acc, playerSeparation)
-        self.acc = addVector(self.acc, playerCohesion)
+        if player != None:
+            playerSeparation = self.playerSeparation(player)
+            playerCohesion = self.playerCohesion(player)
+            self.acc = addVector(self.acc, playerSeparation)
+            self.acc = addVector(self.acc, playerCohesion)
 
     def update(self, app):
         # update position
@@ -209,4 +211,6 @@ class Boid(object):
     def show(self, app, canvas):
         r = 7
         cx, cy = self.pos
-        canvas.create_rectangle(cx-r, cy-r, cx+r, cy+r)
+        #canvas.create_rectangle(cx-r, cy-r, cx+r, cy+r, fill = 'white')
+        shape = [(cx, cy-r), (cx+r, cy), (cx, cy+r), (cx-r, cy)]
+        canvas.create_polygon(shape, fill = 'white', outline = 'black')

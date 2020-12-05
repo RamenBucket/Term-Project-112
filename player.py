@@ -238,8 +238,15 @@ class Player(object):
             velocity = random.uniform(1, 5)
             velocityVector = multiplyVector(getVector(randomAngle), velocity)
             dx, dy = velocityVector
+            # shape
+            shapeIndex = random.randrange(len(app.asteroidShapes))
+            newShape = copy.deepcopy(app.asteroidShapes[shapeIndex])
+            for i in range(len(newShape)):
+                point = newShape[i]
+                point = divideVector(point, 10)
+                newShape[i] = point
             # add explosion
-            app.explosions.append(Asteroid([(5,5),(5,-5),(-5,-5),(-5,5)], positionVector, (dx, -dy), False))
+            app.explosions.append(Asteroid(newShape, positionVector, (dx, -dy), False))
 
     # uses ray casting to determine if a point is in polygon
     def inAsteroid(self, app):

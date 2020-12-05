@@ -18,18 +18,20 @@ def clip(subjectPolygon, clipPolygon):
         cp2 = clipVertex
         inputList = outputList
         outputList = []
-        if inputList == None: return
-        s = inputList[-1]
- 
-        for subjectVertex in inputList:
-            e = subjectVertex
-            if inside(e):
-                if not inside(s):
+        try:
+            s = inputList[-1]
+    
+            for subjectVertex in inputList:
+                e = subjectVertex
+                if inside(e):
+                    if not inside(s):
+                        outputList.append(computeIntersection())
+                    outputList.append(e)
+                elif inside(s):
                     outputList.append(computeIntersection())
-                outputList.append(e)
-            elif inside(s):
-                outputList.append(computeIntersection())
-            s = e
-        cp1 = cp2
+                s = e
+            cp1 = cp2
+        except:
+            continue
 
     return(outputList)
