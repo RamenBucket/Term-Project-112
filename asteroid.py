@@ -97,12 +97,12 @@ class Asteroid(object):
 
         (x1, y1), (x2, y2) = pos1, pos2 # original positions
 
-        (cutX0, cutY0), (cutX1, cutY1) = p0, p1
+        """ (cutX0, cutY0), (cutX1, cutY1) = p0, p1
         v1 = (cutX1-cutX0, cutY1-cutX1)
         v2 = (cutX1-self.pos[0], -1*(cutY1-self.pos[1]))
-        xp = v1[0]*v2[1] - v1[1]*v2[0] # cross product based on shot vector
+        xp = v1[0]*v2[1] - v1[1]*v2[0] # cross product based on shot vector """
 
-        if(xp<0): # poly1 is moving to the right
+        if(x1>x2): # poly1 is moving to the right
             vel1 = (vx+dvx, vy+dvy) 
             vel2 = (vx-dvx, vy-dvy)
         else: # poly2 is moving right

@@ -117,18 +117,19 @@ class GameMode(Mode):
             # random position
             randomX = random.randint(0 - margin, mode.width + margin)
             randomY = random.randint(0 - margin, mode.height + margin)
-            while 0 < randomX < mode.width and 0 < randomX < mode.height:
+            while 0 < randomX < mode.width and 0 < randomY < mode.height:
                 randomX = random.randint(0 - margin, mode.width + margin)
                 randomY = random.randint(0 - margin, mode.height + margin)
             # random velocity
-            if randomX < mode.width: 
+            if randomX < mode.width/2: 
                 xVector = random.uniform(1,1.5)
             else: 
                 xVector = -1 * random.uniform(1,1.5)
-            if randomY < mode.height: 
+            if randomY < mode.height/2: 
                 yVector = random.uniform(1,1.5)
             else: 
                 yVector = -1 * random.uniform(1,1.5)
+            # random shape
             asteroidIndex = random.randrange(0, len(mode.asteroidShapes))
             # create random asteroid
             newWave.append(Asteroid(mode.asteroidShapes[asteroidIndex], (randomX, randomY), (xVector, yVector), False))
@@ -324,18 +325,19 @@ class SplashScreenMode(Mode):
             # random position
             randomX = random.randint(0 - margin, mode.width + margin)
             randomY = random.randint(0 - margin, mode.height + margin)
-            while 0 < randomX < mode.width and 0 < randomX < mode.height:
+            while 0 < randomX < mode.width and 0 < randomY < mode.height:
                 randomX = random.randint(0 - margin, mode.width + margin)
                 randomY = random.randint(0 - margin, mode.height + margin)
             # random velocity
-            if randomX < mode.width: 
+            if randomX < mode.width/2: 
                 xVector = random.uniform(1,1.5)
             else: 
                 xVector = -1 * random.uniform(1,1.5)
-            if randomY < mode.height: 
+            if randomY < mode.height/2: 
                 yVector = random.uniform(1,1.5)
             else: 
                 yVector = -1 * random.uniform(1,1.5)
+            # random shape
             asteroidIndex = random.randrange(0, len(mode.asteroidShapes))
             # create random asteroid
             newWave.append(Asteroid(mode.asteroidShapes[asteroidIndex], (randomX, randomY), (xVector, yVector), False))
