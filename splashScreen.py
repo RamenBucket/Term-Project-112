@@ -33,7 +33,7 @@ class SplashScreenMode(Mode):
         mode.initFlock(15)
         mode.alienShots = []
         # backgrounds
-        bg = mode.loadImage('space_bg.png')
+        bg = mode.loadImage('bg0.png')
         mode.bg = ImageTk.PhotoImage(bg)
         mode.showSubtext = True
         mode.lastSubtextTime = time.time()

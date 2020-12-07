@@ -23,7 +23,8 @@ def find_centroid(v):
         ans[1] += (y0 + y1) * A 
   
     signedArea *= 0.5
-    ans[0] = (ans[0]) / (6 * signedArea) 
-    ans[1] = (ans[1]) / (6 * signedArea) 
+    if signedArea != 0:
+        ans[0] = (ans[0]) / (6 * signedArea) 
+        ans[1] = (ans[1]) / (6 * signedArea) 
   
     return ans 

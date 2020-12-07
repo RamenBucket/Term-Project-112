@@ -57,7 +57,7 @@ class GameMode(Mode):
         mode.initFlock(15)
         mode.alienShots = []
         # backgrounds
-        bg = mode.loadImage('space_bg.png')
+        bg = mode.loadImage('bg0.png')
         mode.bg = ImageTk.PhotoImage(bg)
         # timer
         mode.lastWaveTime = time.time()

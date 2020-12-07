@@ -37,7 +37,7 @@ class EndScreenMode(Mode):
         mode.initFlock(15)
         mode.alienShots = []
         # backgrounds
-        bg = mode.loadImage('space_bg.png')
+        bg = mode.loadImage('bg0.png')
         mode.bg = ImageTk.PhotoImage(bg)
         mode.showSubtext = True
         mode.lastSubtextTime = time.time()
@@ -55,8 +55,7 @@ class EndScreenMode(Mode):
             mode.flock.append(Boid(pos, vel, acc))
 
     def keyPressed(mode, event):
-        mode.app.setActiveMode(mode.app.gameMode)
-        mode.app.gameMode.appStarted()
+        mode.app.setActiveMode(mode.app.splashScreenMode)
 
     def timerFired(mode):
         mode.handleAsteroids() # asteroid must update before player raycasting 
@@ -203,7 +202,7 @@ class EndScreenMode(Mode):
         titleMargin = 40
         canvas.create_text(mode.height/2, mode.height/4 + titleMargin, 
                            text = 'HIGHSCORES', fill = 'white', font= 'System 20')
-        textMargin = 50 + titleMargin
+        textMargin = 60 + titleMargin
         canvas.create_text(mode.height/2+50, mode.height/4 + textMargin, 
                            text = 'SCORE', fill = 'white', font= 'System 20', anchor = 'w')
         canvas.create_text(mode.height/4 + titleMargin, mode.height/4 + textMargin, 
