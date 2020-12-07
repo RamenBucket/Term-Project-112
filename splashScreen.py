@@ -1,14 +1,6 @@
-# Sources
-# https://www.red3d.com/cwr/boids/
-# https://github.com/RamenBucket/112-Hackathon-20
-# https://ncase.me/sight-and-light/
-# https://thecodingtrain.com/CodingChallenges/124-flocking-boids
-
 from cmu_112_graphics import *
 from asteroid import *
 from boid import *
-from splashScreen import *
-from endScreen import *
 from ray import Ray, getAngle, getVector
 from polygonSide import PolygonSide
 from player import Player
@@ -19,7 +11,7 @@ import math
 import time
 import random
 
-class GameMode(Mode):
+class SplashScreenMode(Mode):
     def appStarted(mode):
         # asteroids
         mode.asteroids = []
@@ -36,22 +28,6 @@ class GameMode(Mode):
                             PolygonSide((mode.width,0),(mode.width,mode.height)),
                             PolygonSide((mode.width,mode.height),(0,mode.height)),
                             PolygonSide((0,mode.height),(0,0))]
-        # player
-        playerPos = [mode.width/2, mode.height/2]
-        playerAngle = math.pi/2
-        playerHealth = 100
-        mode.playerShape = [[0,-20],[10,10],[0,5],[-10,10]]
-        mode.player = Player(playerPos, playerAngle, mode.playerShape, playerHealth)
-        mode.inputs = set()
-        # player shooting
-        mode.shotP1 = None
-        mode.shotP2 = None
-        mode.lastShotTime = None
-        mode.totalShotTime = .5
-        mode.playerIsShooting = False
-        # player health
-        mode.lastRemoveHealthTime = time.time()
-        mode.totalRemoveHealthTime = .05
         # aliens
         mode.flock = []
         mode.initFlock(15)
@@ -59,6 +35,9 @@ class GameMode(Mode):
         # backgrounds
         bg = mode.loadImage('space_bg.png')
         mode.bg = ImageTk.PhotoImage(bg)
+        mode.showSubtext = True
+        mode.lastSubtextTime = time.time()
+        mode.totalSubtextTime = .7
         # timer
         mode.lastWaveTime = time.time()
         mode.timeBetweenWaves = .5
@@ -72,25 +51,18 @@ class GameMode(Mode):
             mode.flock.append(Boid(pos, vel, acc))
 
     def keyPressed(mode, event):
-        controls = {'w', 'a', 's', 'd'}
-        if event.key in controls:
-            mode.inputs.add(event.key)
-        if event.key == 'Space':
-            if not mode.playerIsShooting:
-                mode.shotP1, mode.shotP2 = mode.player.shoot(mode)
-                mode.lastShotTime = time.time()
-                mode.playerIsShooting = True
-        
-    def keyReleased(mode, event):
-        controls = {'w', 'a', 's', 'd'}
-        if event.key in controls:
-            mode.inputs.add(event.key) # for error when switching app modes
-            mode.inputs.remove(event.key)
+        mode.app.setActiveMode(mode.app.gameMode)
+        mode.app.gameMode.appStarted()
 
     def timerFired(mode):
         mode.handleAsteroids() # asteroid must update before player raycasting 
-        mode.handlePlayer()
         mode.handleFlock()
+        mode.handleSubtext()
+
+    def handleSubtext(mode):
+        if (time.time() - mode.lastSubtextTime > mode.totalSubtextTime):
+            mode.showSubtext = not mode.showSubtext
+            mode.lastSubtextTime = time.time()
 
     ###################
     # asteroid update #
@@ -159,51 +131,14 @@ class GameMode(Mode):
             else:
                 i += 1
 
-    #################
-    # player update #
-    #################
-    def handlePlayer(mode):
-        mode.player.update(mode) # movement and raycasting
-        mode.shotTimer() # shooting
-        if mode.player.inAsteroid(mode): # health
-            mode.doRemoveHealth()
-            if mode.player.health < 0:
-                mode.handleLeaderboard()
-                mode.app.setActiveMode(mode.app.endScreenMode)
-                mode.app.endScreenMode.appStarted()
-
-    def shotTimer(mode):
-        if mode.playerIsShooting:
-            if (mode.lastShotTime == None) or (time.time() - mode.lastShotTime > mode.totalShotTime):
-                mode.playerIsShooting = False
-
-    def doRemoveHealth(mode):
-        if (time.time() - mode.lastRemoveHealthTime > mode.totalRemoveHealthTime):
-            mode.lastRemoveHealthTime = time.time()
-            mode.player.removeHealth(1)
-
-    def handleLeaderboard(mode):
-        # reading the file and converting it into list of ints
-        scores = open('scores.txt', 'r')
-        intScoreList = [int(score) for score in scores.read().splitlines()]
-        scores.close()
-        # adding current score and sorting 
-        intScoreList.append(mode.player.score)
-        intScoreList.sort(reverse=True)
-        # convert back to string and writes top 5 scores to file
-        newScoreList = [str(score) + '\n' for score in intScoreList[0:5]]
-        scores = open('scores.txt', 'w')
-        scores.writelines(newScoreList)
-        scores.close()
-
     ################
     # flock update #
     ################
     def handleFlock(mode):
         for boid in mode.flock: # flock update
-            boid.flock(mode.flock, mode.asteroids, mode.player)
+            boid.flock(mode.flock, mode.asteroids)
             boid.update(mode)
-            boid.shoot(mode)
+            # boid.shoot(mode)
         for shot in mode.alienShots: # shot update
             shot.move()
         mode.removeShots() # remove
@@ -220,15 +155,10 @@ class GameMode(Mode):
                 i += 1
 
     def redrawAll(mode, canvas):
-        # game
         mode.drawBackground(canvas)
         mode.drawAsteroids(canvas)
-        mode.drawPlayer(canvas)
-        mode.drawExplosions(canvas)
         mode.drawAliens(canvas)
-        # UI
-        mode.player.drawHealth(mode, canvas)
-        mode.player.drawScore(mode, canvas)
+        mode.drawUI(canvas)
 
     def drawBackground(mode, canvas):
         canvas.create_image(mode.width/2, mode.height/2, image = mode.bg)
@@ -238,21 +168,6 @@ class GameMode(Mode):
             asteroidX, asteroidY = asteroid.pos
             coords = localToGlobal(asteroid.points, asteroidX, asteroidY)
             canvas.create_polygon(coords, outline = 'white', width = 1)
-
-    def drawExplosions(mode, canvas):
-        for explosion in mode.explosions:
-            explosionX, explosionY = explosion.pos
-            coords = localToGlobal(explosion.points, explosionX, explosionY)
-            canvas.create_polygon(coords, outline = 'white', width = 1)
-
-    def drawPlayer(mode, canvas):
-        mode.player.show(mode, canvas)
-        if mode.playerIsShooting:
-            x0, y0 = mode.shotP1
-            x1, y1 = mode.shotP2
-            # makes the line shrink after it it shot
-            currWidth = mode.totalShotTime / ((time.time() - mode.lastShotTime) + .01) 
-            canvas.create_line(x0, y0, x1, y1, fill = 'black', width = currWidth)
 
     def drawAliens(mode, canvas):
         for boid in mode.flock:
@@ -264,12 +179,10 @@ class GameMode(Mode):
             shotX, shotY = shot.pos
             coords = localToGlobal(shot.points, shotX, shotY)
             canvas.create_polygon(coords, outline = 'white', width = 1)
-
-class Asteroids(ModalApp):
-    def appStarted(app):
-        app.gameMode = GameMode()
-        app.splashScreenMode = SplashScreenMode()
-        app.endScreenMode = EndScreenMode()
-        app.setActiveMode(app.splashScreenMode)
-
-app = Asteroids(width=1024, height=1024)
+    
+    def drawUI(mode, canvas):
+        title = 'ASTEROIDS'
+        canvas.create_text(mode.width/2, mode.height/3, text = title, font= 'System 500', fill = 'white')
+        subText = 'PRESS ANY KEY TO BEGIN'
+        if mode.showSubtext:
+            canvas.create_text(mode.width/2, mode.height*2/3, text = subText, font= 'System 20', fill = 'white')
