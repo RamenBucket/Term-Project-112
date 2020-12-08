@@ -11,6 +11,7 @@ import math
 import time
 import random
 
+# this mode shows handles endscreen events
 class EndScreenMode(Mode):
     def appStarted(mode):
         # reading the file and converting it into list of ints
@@ -55,7 +56,8 @@ class EndScreenMode(Mode):
             mode.flock.append(Boid(pos, vel, acc))
 
     def keyPressed(mode, event):
-        mode.app.setActiveMode(mode.app.splashScreenMode)
+        if event.key == 'Enter':
+            mode.app.setActiveMode(mode.app.splashScreenMode)
 
     def timerFired(mode):
         mode.handleAsteroids() # asteroid must update before player raycasting 
@@ -186,7 +188,7 @@ class EndScreenMode(Mode):
             canvas.create_polygon(coords, outline = 'white', width = 1)
     
     def drawUI(mode, canvas):
-        subText = 'PRESS ANY KEY TO CONTINUE'
+        subText = 'PRESS ENTER TO CONTINUE'
         if mode.showSubtext:
             canvas.create_text(mode.width/2, mode.height*4/5, text = subText, font= 'System 20', fill = 'white')
 

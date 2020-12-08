@@ -54,6 +54,8 @@ def getArea(points):
         total += (x1 * y2) - (y1 * x2)
     return abs(total / 2)
 
+# asteroid from hack 112 project (changed fruit.py)
+# https://github.com/RamenBucket/112-Hackathon-20
 class Asteroid(object):
     def __init__(self, points, pos, vel, uncut):
         self.pos = pos

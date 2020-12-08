@@ -106,6 +106,7 @@ def multiplyVector(v, n):
 def divideVector(v, n):
     return [v[0] / n, v[1] / n]
 
+# player class, handles controls, and player displays
 class Player(object):
     # pos is a list of x and y and angle in the direction in radians
     def __init__(self, pos, angle, points, health):

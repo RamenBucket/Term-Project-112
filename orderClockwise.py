@@ -1,6 +1,9 @@
+# from hack 112 project used gift wrapping algorithm
+# https://github.com/RamenBucket/112-Hackathon-20
+
 import math
 
-def orderClockwise(points): #jarvis
+def orderClockwise(points): # jarvis
     if (len(points)<3) : return None # check actual polygon
 
     Hull = list()

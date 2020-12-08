@@ -1,8 +1,12 @@
-# Sources
+# Sources (also cited before the specific sections in the code)
 # https://www.red3d.com/cwr/boids/
 # https://github.com/RamenBucket/112-Hackathon-20
 # https://ncase.me/sight-and-light/
 # https://thecodingtrain.com/CodingChallenges/124-flocking-boids
+# http://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping#Python
+# https://www.cs.cmu.edu/~112/notes/notes-animations-part1.html#installingModules
+# https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+# https://thecodingtrain.com/CodingChallenges/145-2d-ray-casting.html
 
 from cmu_112_graphics import *
 from asteroid import *

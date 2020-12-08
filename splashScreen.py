@@ -11,6 +11,7 @@ import math
 import time
 import random
 
+# this mode shows handles splashscreen events
 class SplashScreenMode(Mode):
     def appStarted(mode):
         # asteroids

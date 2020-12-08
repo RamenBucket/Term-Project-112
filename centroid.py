@@ -1,6 +1,9 @@
+# from hack 112 project used centroid algorithm
+# https://github.com/RamenBucket/112-Hackathon-20
+
 def find_centroid(v): 
     ans = [0, 0] 
-  
+
     n = len(v) 
     signedArea = 0
   

@@ -1,3 +1,6 @@
+# from # from hack 112 project
+# https://github.com/RamenBucket/112-Hackathon-20
+
 from orderClockwise import orderClockwise
 from clipping import clip
 from intersectLine import *
@@ -96,13 +99,3 @@ def sliceIntersectsPolygon(polyList, mousePoint1, mousePoint2):
         if doIntersect(p1,q1,p2,q2):
             return True
     return False
-
-""" def testSliceIntersectsPolygon():
-    polyList = [(50, 50), (462, 50), (462, 462), (50, 462)]
-    mousePoint1, mousePoint2 = [(341, 14), (444, 15)]
-    print(sliceIntersectsPolygon(polyList, mousePoint1, mousePoint2))
-    polyList = [(50, 50), (462, 50), (462, 462), (50, 462)]
-    mousePoint1, mousePoint2 = [(87, 23), (502, 345)]
-    print(sliceIntersectsPolygon(polyList, mousePoint1, mousePoint2))
-
-testSliceIntersectsPolygon() """

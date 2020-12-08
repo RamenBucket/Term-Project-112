@@ -21,6 +21,7 @@ def getAngle(x, y):
 def getVector(angle):
     return (math.cos(angle), math.sin(angle))
 
+# from https://thecodingtrain.com/CodingChallenges/145-2d-ray-casting.html
 class Ray(object):
     def __init__(self, point, directionX = 1, directionY = 0, angle = math.pi/2):
         self.point = point

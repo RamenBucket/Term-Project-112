@@ -1,4 +1,4 @@
-#https://www.cs.cmu.edu/~112/notes/notes-animations-part1.html#installingModules
+# from https://www.cs.cmu.edu/~112/notes/notes-animations-part1.html#installingModules
 # cmu_112_graphics.py
 # version 0.8.6
 

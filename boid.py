@@ -42,6 +42,7 @@ def divideVector(v, n):
 def distance(p1, p2):
     return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
 
+# flocking from https://thecodingtrain.com/CodingChallenges/124-flocking-boids
 class Boid(object):
     def __init__(self, pos, vel, acc):
         self.pos = pos
