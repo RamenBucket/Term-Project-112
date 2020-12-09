@@ -1,9 +1,13 @@
 # Term-Project-112 - Asteroids
-# “Asteroids” is based on the shooter arcade game with the same name created by Atari in 1979. In the game, you will be controlling a spaceship to shoot asteroids and score points, as well as dodge aliens.
+# Description: “Asteroids” is based on the shooter arcade game with the same name created by Atari in 1979. In the game, you will be controlling a spaceship to shoot asteroids and score points, as well as dodge aliens.
 #
-# asteroids.py is the main file. It contains the game class and the ModalApp class. splashScreen.py and endScreen.py contain the spash and end screen classes. The project only uses 112 graphics, so no modules are needed.
+# How to run: asteroids.py is the main file, just run it in an editor to run the program. It contains the game class and the ModalApp class. splashScreen.py and endScreen.py contain the spash and end screen classes. 
 #
 # Most of the important code is in player.py, asteroids.py, astroid.py, ray.py, boid.py, and sliceFunction.py.
+#
+# Libraries: The project only uses 112 graphics, so no modules are needed.
+#
+# Shortcuts: ctrl+p to pause
 #
 # Sources used:
 # https://www.red3d.com/cwr/boids/
